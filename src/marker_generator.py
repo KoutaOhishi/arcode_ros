@@ -7,9 +7,9 @@ PACKAGE_PATH = rospkg.RosPack().get_path("arcode_ros")
 PIXEL_SIZE = 100
 
 def ar_marker_generator():
-    print("#######################")
+    print("\n#######################")
     print("# AR Marker Generator #")
-    print("#######################")
+    print("#######################\n")
     
     aruco = cv2.aruco
 
