@@ -1,0 +1,9 @@
+<launch>
+    <group ns="arcode_ros" >
+        <param name="sub_img_name" type="str" value="/usb_cam/image_raw" />
+        <param name="show_result_img" type="bool" value="True" />
+        <param name="show_result_console" type="bool" value="True" />
+
+        <node pkg="arcode_ros" type="marker_detector.py" name="marker_detector" output="screen" />
+    </group>
+</launch>
