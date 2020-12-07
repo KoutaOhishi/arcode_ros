@@ -45,11 +45,15 @@ class ArCodeRos():
                 for i in range(len(corners)):
                     bounding_box = BoundingBox()
 
-                    center_x = corners[i][0][2][0] - corners[i][0][0][0] 
-                    center_y = corners[i][0][2][1] - corners[i][0][0][1] 
-
+                    center_x = (corners[i][0][2][0] + corners[i][0][0][0])/2
+                    center_y = (corners[i][0][2][1] + corners[i][0][0][1])/2
+                    dimension_x = corners[i][0][2][0] - corners[i][0][0][0]
+                    dimension_y = corners[i][0][2][1] - corners[i][0][0][1]
+                    
                     bounding_box.pose.position.x = center_x
                     bounding_box.pose.position.y = center_y
+                    bounding_box.dimensions.x = dimension_x
+                    bounding_box.dimensions.y = dimension_y
 
                     bounding_box.header.frame_id = str(ids[i])
                     bounding_box.label = int(ids[i])
@@ -57,7 +61,7 @@ class ArCodeRos():
                     bouning_box_array.boxes.append(bounding_box)
 
                     if self.show_result_console == True:
-                        rospy.loginfo("ID:%d (%d, %d)" % (ids[i], center_x, center_y))
+                        rospy.loginfo("ID:%d (x:%d y:%d width:%d height:%d)" % (ids[i], center_x, center_y, dimension_x, dimension_y))
 
                         if i == len(corners)-1:
                             print("\n")
