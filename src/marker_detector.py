@@ -13,6 +13,8 @@ class ArCodeRos():
         print("\n######################")
         print("# Ar Marker Detector #")
         print("######################\n")
+
+        rospy.init_node("arcode_ros", anonymous=False)
         
         self.sub_img_name = rospy.get_param("sub_img_name", "/camera/rgb/image_raw")
         self.show_result_img = rospy.get_param("show_result_img", False)
@@ -79,7 +81,6 @@ class ArCodeRos():
             rospy.logerr("Failed to CvBridge.")
 
     def main(self):
-        rospy.init_node("arcode_ros", anonymous=False)
         rospy.spin()
 
 if __name__ == "__main__":
