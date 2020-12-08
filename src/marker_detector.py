@@ -3,6 +3,7 @@
 import rospy, rospkg, rosparam
 import cv2
 import numpy as np
+import math
 
 from sensor_msgs.msg import Image
 from jsk_recognition_msgs.msg import BoundingBox, BoundingBoxArray
@@ -49,11 +50,14 @@ class ArCodeRos():
 
                     center_x = (corners[i][0][2][0] + corners[i][0][0][0])/2
                     center_y = (corners[i][0][2][1] + corners[i][0][0][1])/2
-                    dimension_x = corners[i][0][2][0] - corners[i][0][0][0]
-                    dimension_y = corners[i][0][2][1] - corners[i][0][0][1]
-                    
                     bounding_box.pose.position.x = center_x
                     bounding_box.pose.position.y = center_y
+
+                    radian = math.atan2(abs(corners[i][0][0][1]-corners[i][0][1][1]), abs(corners[i][0][0][0]-corners[i][0][1][0]))
+                    bounding_box.pose.orientation.z = radian
+
+                    dimension_x = corners[i][0][2][0] - corners[i][0][0][0]
+                    dimension_y = corners[i][0][2][1] - corners[i][0][0][1]
                     bounding_box.dimensions.x = dimension_x
                     bounding_box.dimensions.y = dimension_y
 
@@ -63,7 +67,7 @@ class ArCodeRos():
                     bouning_box_array.boxes.append(bounding_box)
 
                     if self.show_result_console == True:
-                        rospy.loginfo("ID:%d (x:%d y:%d width:%d height:%d)" % (ids[i], center_x, center_y, dimension_x, dimension_y))
+                        rospy.loginfo("ID:%d (x:%d y:%d width:%d height:%d rad:%f)" % (ids[i], center_x, center_y, dimension_x, dimension_y, radian))
 
                         if i == len(corners)-1:
                             print("\n")
