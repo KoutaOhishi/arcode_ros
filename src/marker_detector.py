@@ -65,12 +65,12 @@ class ArCodeRos():
                     markers_info.markers_info.append(marker_info)
 
                     if self.show_result_console == True:
-                        rospy.loginfo("ID:%d (x:%d y:%d width:%d height:%d rad:%f)" % (ids[i], center_x, center_y, dimension_x, dimension_y, radian))
+                        rospy.loginfo("ID:%d (x:%d y:%d)" % (ids[i], marker_info.center.x, marker_info.center.y))
 
                         if i == len(corners)-1:
                             print("\n")
 
-                self.result_publisher.publish(bouning_box_array)
+                self.result_publisher.publish(markers_info)
     
 
             if self.show_result_img == True:
