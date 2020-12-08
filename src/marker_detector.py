@@ -6,7 +6,7 @@ import numpy as np
 import math
 
 from sensor_msgs.msg import Image
-from jsk_recognition_msgs.msg import BoundingBox, BoundingBoxArray
+from arcode_ros.msg import MarkerInfo, MarkersInfo
 from cv_bridge import CvBridge, CvBridgeError
 
 class ArCodeRos():
@@ -22,7 +22,7 @@ class ArCodeRos():
         self.show_result_console = rospy.get_param("show_result_console", False)
 
         self.img_subscriber = rospy.Subscriber(self.sub_img_name, Image, self.sub_img_callback)
-        self.result_publisher = rospy.Publisher("/arcode_ros/detect_result", BoundingBoxArray, queue_size=10)
+        self.result_publisher = rospy.Publisher("/arcode_ros/detect_result", MarkersInfo, queue_size=10)
 
         self.aruco = cv2.aruco
         self.dic = self.aruco.getPredefinedDictionary(self.aruco.DICT_4X4_50) #生成したマーカーと合わせる
@@ -34,37 +34,35 @@ class ArCodeRos():
             corners, ids, _ = self.aruco.detectMarkers(cv_img, self.dic)
             #https://qiita.com/marimori/items/74774685c7a2f1df0adc
             #
-            # 0 - 1
-            # |   |
-            # 3 - 2
+            #   0 - 1
+            #   |   |
+            #   3 - 2
 
             if len(corners) == 0:
                 if self.show_result_console == True:
                     rospy.logwarn("No AR Markers\n")
             
             else:
-                bouning_box_array = BoundingBoxArray()
+                markers_info = MarkersInfo()
 
                 for i in range(len(corners)):
-                    bounding_box = BoundingBox()
+                    marker_info = MarkerInfo()
 
-                    center_x = (corners[i][0][2][0] + corners[i][0][0][0])/2
-                    center_y = (corners[i][0][2][1] + corners[i][0][0][1])/2
-                    bounding_box.pose.position.x = center_x
-                    bounding_box.pose.position.y = center_y
+                    marker_info.left_top.x = corners[i][0][0][0]
+                    marker_info.left_top.y = corners[i][0][0][1]
+                    marker_info.right_top.x = corners[i][0][1][0]
+                    marker_info.right_top.y = corners[i][0][1][1]
+                    marker_info.right_bottom.x = corners[i][0][2][0]
+                    marker_info.right_bottom.y = corners[i][0][2][1]
+                    marker_info.left_bottom.x = corners[i][0][3][0]
+                    marker_info.left_bottom.y = corners[i][0][3][1]
 
-                    radian = math.atan2(abs(corners[i][0][0][1]-corners[i][0][1][1]), abs(corners[i][0][0][0]-corners[i][0][1][0]))
-                    bounding_box.pose.orientation.z = radian
+                    marker_info.center.x = (marker_info.left_top.x + marker_info.right_bottom.x) / 2
+                    marker_info.center.y = (marker_info.left_top.y + marker_info.right_bottom.y) / 2
 
-                    dimension_x = corners[i][0][2][0] - corners[i][0][0][0]
-                    dimension_y = corners[i][0][2][1] - corners[i][0][0][1]
-                    bounding_box.dimensions.x = dimension_x
-                    bounding_box.dimensions.y = dimension_y
+                    marker_info.value = int(ids[i])
 
-                    bounding_box.header.frame_id = str(ids[i])
-                    bounding_box.label = int(ids[i])
-
-                    bouning_box_array.boxes.append(bounding_box)
+                    markers_info.markers_info.append(marker_info)
 
                     if self.show_result_console == True:
                         rospy.loginfo("ID:%d (x:%d y:%d width:%d height:%d rad:%f)" % (ids[i], center_x, center_y, dimension_x, dimension_y, radian))
