@@ -1,0 +1,6 @@
+geometry_msgs/Point left_top
+geometry_msgs/Point right_top
+geometry_msgs/Point right_bottom
+geometry_msgs/Point left_bottom
+geometry_msgs/Point center
+int8 value
